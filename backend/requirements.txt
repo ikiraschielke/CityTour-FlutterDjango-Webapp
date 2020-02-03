@@ -1,0 +1,10 @@
+Django==2.2.9
+mysqlclient==1.4.6
+django-mysql==2.2.0
+path
+dj-database-url==0.4.1
+gunicorn==19.6.0
+#psycopg2==2.6.2
+whitenoise==3.2
+djangorestframework==3.11.0
+djangorestframework-simplejwt==4.4.0
