@@ -12,13 +12,14 @@ services:
     restart: always
     volumes: 
       - ".:/city/backend"
-  db: 
-    environment: 
-      MYSQL_DATABASE: city-db
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_USER: root
-    image: "mysql:5.7"
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_HOST: localhost
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: citymysql
+      MYSQL_PASSWORD: stadtrundgang
+      MYSQL_ROOT_PASSWORD: stadtrundgang
     ports: 
       - "3306:3306"
     restart: always

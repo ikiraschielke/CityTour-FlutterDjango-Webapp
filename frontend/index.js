@@ -43,7 +43,7 @@ app.post('/item/add', (req, res) => {
 // to run it later from any custom port
 //var port = process.env.PORT || 3000;
 
-const port = 3000;
+const port =  3000;
 
 
 app.listen(port, () => console.log('Server running on port ' + port));

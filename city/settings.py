@@ -25,7 +25,7 @@ SECRET_KEY = 'vtix8tx!olo^3pz%xh^fny3&qjnlkxiiv9@gzivscl9^i1+5t9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['db','localhost','127.0.0.1', '192.168.99.100:8000', '192.168.99.100']
 
 
 # Application definition
@@ -39,8 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'city',
     'rest_framework',
-    'django.contrib.staticfiles',
-    'whitenoise.runserver_nostatic',
 
 ]
 
@@ -75,20 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'city.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'city-db',
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': 'db',
-        'PORT': 3306,
-    }
-}
 
 
 # Password validation
@@ -142,5 +126,16 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ]
+}
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'citymysql',
+        'HOST': 'localhost', # docker host-ip! was db service name in yml file nor db nor localhost
+        'PORT': '3306',
+        'USER': 'root',
+        'PASSWORD': 'stadtrundgang',
+    }
 }
 
