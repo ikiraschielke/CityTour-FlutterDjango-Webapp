@@ -18,7 +18,9 @@ from django.urls import path
 from django.conf.urls import url, include
 from django.contrib.auth.models import User
 import rest_framework
+from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import routers, serializers, viewsets
+from webapp import views
 
 #In diesem URL DING ARBEITEN DAS SCHEINT IN DER HIERARCHIE AN DER RICHTIGEN STELLE ZU SEIN
 
@@ -42,6 +44,7 @@ router.register(r'users', UserViewSet)
 # just in case we need it
 urlpatterns = [
     path('admin/', admin.site.urls),
+    url(r'^landmarks/', views.LandmarkList.as_view()),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls')),
 ]
