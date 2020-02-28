@@ -1,13 +1,17 @@
 import rest_framework
 from rest_framework import serializers
-from . models import Landmark
+from . models import Landmark, File
 
 class LandmarkSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Landmark
-        fields = ["landmark_id", "name", "n_media"]
-        #or in fancy
-        #fields = '__all__'
+        fields = ["landmark_id", "name", "longitude","latitude"]
+
+
+class FileSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = File
+        fields = "__all__"
 
 
 """

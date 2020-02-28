@@ -115,6 +115,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Own URL Specification
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 # for creating simple read-write API
 # user access on information
 

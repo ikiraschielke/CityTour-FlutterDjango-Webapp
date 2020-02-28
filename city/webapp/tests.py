@@ -12,30 +12,22 @@ from . serializers import LandmarkSerializer
 
 # tests for views
 
-class Landmark(models.Model):
-	landmark_id		= models.IntegerField(primary_key=True)
-	name	= models.CharField(max_length=200)
-	media    = models.CharField(max_length=200)
-	n_media		= models.IntegerField()
-	
-	def __str__(self):     
-		return self.name
 
-
+#debug testfile
 class BaseViewTest(APITestCase):
     client = APIClient()
 
     @staticmethod
-    def create_landmark(landmark_id="", name=""):
-        if landmark_id != "" and name != "":
+    def create_landmark(landmark_id="", name="", longitude="", latitude=""):
+        if landmark_id != "" and name != "" and longitude != "" and latitude != "":
             Landmark.objects.create(landmark_id=landmark_id, name=name)
 
     def setUp(self):
         # add test data
-        self.create_landmark("1", "Ludwigskirch")
-        self.create_landmark("2", "Langer Ludwig")
-        self.create_landmark("3", "Mathildenhöhe")
-        self.create_landmark("4", "Russische Kapelle")
+        self.create_landmark("1", "Ludwigskirch", "49.8681083","8.6501996")
+        self.create_landmark("2", "Langer Ludwig", "49.8728581","8.6490039")
+        self.create_landmark("3", "Mathildenhöhe", "49.8767891","8.6648602")
+        self.create_landmark("4", "Bahnhof", "49.872571","8.6273814")
 
 
 class GetAllLandmarksTest(BaseViewTest):

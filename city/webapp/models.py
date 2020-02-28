@@ -8,7 +8,7 @@ from django.db import models
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-from django.db import models
+
 
 
 class AuthGroup(models.Model):
@@ -123,13 +123,29 @@ class DjangoSession(models.Model):
 ###########################################
 
 class Landmark(models.Model):
-	landmark_id		= models.IntegerField(primary_key=True)
-	name	= models.CharField(max_length=200)
-	media    = models.CharField(max_length=200)
-	n_media		= models.IntegerField()
-	
-	def __str__(self):     
-		return "{} - {}".format(self.landmark_id, self.name)
+    landmark_id = models.IntegerField(primary_key=True)
+    name    = models.CharField(max_length=200)
+    media   = models.CharField(max_length=200)
+    longitude = models.FloatField()
+    latitude = models.FloatField()
+    file = models.FileField(null=True)
+
+    def __str__(self):     
+        return "{} - {} loc: {}-{}".format(self.landmark_id, self.name,self.longitude, self.latitude)
+
+"""
+Files uploaded to FileField are not saved in the database but in the file system of your server. 
+In the database it's the fields are represented by a VARCHAR containing the reference to the file.
+"""
+
+class File(models.Model):
+    name    = models.CharField(max_length=200)
+    file = models.FileField()
+
+    def __str__(self):
+        return "{} - {}".format(self.name, self.file.name)
+
+#TODO LATER IMAGEFIELD
 
 # Create your models here.
 """
