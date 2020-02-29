@@ -122,71 +122,44 @@ class DjangoSession(models.Model):
 
 ###########################################
 
-class Landmark(models.Model):
-    landmark_id = models.IntegerField(primary_key=True)
+#landmarks has many medias
+#ausmodellieren
+class Media(models.Model):
+
+    media_id = models.IntegerField()
     name    = models.CharField(max_length=200)
-    media   = models.CharField(max_length=200)
+    media = models.FileField(null=True)
+
+    def __str__(self):
+        return "media-id {}, given name {}, media_name {}".format( self.media_id, self.name, self.media)
+
+class Landmark(models.Model):
+    id =   models.AutoField(primary_key=True)
+    landmark_id = models.IntegerField()
+    name    = models.CharField(max_length=200)
+    desc   = models.CharField(max_length=200)
     longitude = models.FloatField()
     latitude = models.FloatField()
-    file = models.FileField(null=True)
+    media = models.ManyToManyField(Media)
 
     def __str__(self):     
         return "{} - {} loc: {}-{}".format(self.landmark_id, self.name,self.longitude, self.latitude)
 
 """
-Files uploaded to FileField are not saved in the database but in the file system of your server. 
-In the database it's the fields are represented by a VARCHAR containing the reference to the file.
+Media uploaded to FileField are not saved in the database but in the file system of your server. 
+In the database it's the fields are represented by a VARCHAR containing the reference to the media file.
 """
 
-class File(models.Model):
-    name    = models.CharField(max_length=200)
-    file = models.FileField()
 
-    def __str__(self):
-        return "{} - {}".format(self.name, self.file.name)
 
-#TODO LATER IMAGEFIELD
 
 # Create your models here.
 """
-class User(models.Model):
-	user_id		= models.IntegerField(primary_key=True)
-	firstname	= models.CharField(max_length=200)
-	lastname    = models.CharField(max_length=200)
-	email		= models.CharField(unique=True, max_length=200)
-	
-	def __str__(self):     
-		return self.email
-
-	#class Meta:     
-	#	managed = False       
-	#	db_table = 'users'
-
-
-
-	
-class Admin(models.Model):
-	admin_id	= models.IntegerField(primary_key=True)
-	firstname	= models.CharField(max_length=200)
-	lastname    = models.CharField(max_length=200)
-	email		= models.CharField(unique=True, max_length=200)
-	
-	def __str__(self):
-		return self.email
-
-	#class Meta:
-	#	managed = False    
-	#	db_table = 'admins' 
-
-
-
-class Media(models.Model):
-	media_id = models.IntegerField(primary_key=True)
-	user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='medias')
-
 
 # one user can have multiple tours
 # one medium can belong to multiple tours
+
+#tour has many landmarks
 class Tour(models.Model):
 	tour_id =  models.IntegerField(primary_key=True)
 	name = models.CharField(unique=True, max_length=40)

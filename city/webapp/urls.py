@@ -5,5 +5,5 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('', FileUploadView.as_view())
+    path('', MediaUploadView.as_view())
 ]

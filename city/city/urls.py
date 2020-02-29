@@ -41,15 +41,18 @@ class UserViewSet(viewsets.ModelViewSet):
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
+router.register('media', views.MediaView)
+router.register('landmark', views.LandmarkView)
+
 
 # Setting up API for automatic URL routing
 # latter pattern is for enabeling browsable APIs
 # just in case we need it
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('upload/', include('webapp.urls')),
-    url(r'^landmarks/', views.LandmarkList.as_view()),
-    #url(r'^media/', views.FileUploadView.as_view()), # where do i want to put it? 
+    #path('upload/', include('webapp.urls')),
+    #url(r'^landmarks/', views.LandmarkList.as_view()),
+    #url(r'^media/', views.MediaUploadView.as_view()), # where do i want to put it? 
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls')),
 ]
