@@ -25,7 +25,7 @@ SECRET_KEY = 'vtix8tx!olo^3pz%xh^fny3&qjnlkxiiv9@gzivscl9^i1+5t9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.99.100"]
+ALLOWED_HOSTS = ['db','localhost','127.0.0.1', '192.168.99.100:8000', '192.168.99.100']
 
 
 # Application definition
@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'city',
+    'rest_framework',
+
 ]
 
 MIDDLEWARE = [
@@ -63,26 +66,13 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'debug': DEBUG,
         },
     },
 ]
 
 WSGI_APPLICATION = 'city.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'city-db',
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': 'db',
-        'PORT': 3306,
-    }
-}
 
 
 # Password validation
@@ -122,3 +112,30 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# for creating simple read-write API
+# user access on information
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_AUTHETIFICATION_CLASSES': (
+        'rest_framework.authentification.BasicAuthentification',
+        'rest_framework.authentification.SessionAuthentification',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+    ]
+}
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'citymysql',
+        'HOST': 'localhost', # docker host-ip! was db service name in yml file nor db nor localhost
+        'PORT': '3306',
+        'USER': 'root',
+        'PASSWORD': 'stadtrundgang',
+    }
+}
+

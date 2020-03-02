@@ -1,25 +1,40 @@
 version: '3'
-
-services:
+services: 
+  backend: 
+    build: ./backend
+    command: "python manage.py runserver 0.0.0.0:8000"
+    depends_on: 
+      - db
+    links: 
+      - "db:db"
+    ports: 
+      - "8000:8000"
+    restart: always
+    volumes: 
+      - ".:/city/backend"
   db:
     image: mysql:5.7
-    restart: always
-    ports:
-      - '3306:3306'
     environment:
-       MYSQL_DATABASE: 'city-db'
-       MYSQL_USER: 'root'
-       MYSQL_PASSWORD: 'password'
-       MYSQL_ROOT_PASSWORD: 'password'
-  web:
+      MYSQL_HOST: localhost
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: citymysql
+      MYSQL_PASSWORD: stadtrundgang
+      MYSQL_ROOT_PASSWORD: stadtrundgang
+    ports: 
+      - "3306:3306"
     restart: always
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/city
-    links:
+  frontend: 
+    build: ./frontend
+    command: "npm start"
+    depends_on: 
+      - backend
+    environment: 
+      - NODE_ENV=development
+    links: 
       - "db:db"
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
+    ports: 
+      - "3000:3000"
+    restart: always
+    volumes: 
+      - "./frontend:/city/frontend"
+version: "3"
