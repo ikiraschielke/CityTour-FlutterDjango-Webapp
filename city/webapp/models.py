@@ -1,4 +1,5 @@
 from django.db import models
+#from django.contrib.gis.db import models as gis_model
 
 # Create your models here.
 # This is an auto-generated Django model module.
@@ -122,8 +123,11 @@ class DjangoSession(models.Model):
 
 ###########################################
 
-#landmarks has many medias
-#ausmodellieren
+"""
+Media uploaded to FileField are not saved in the database but in the file system of your server. 
+In the database it's the fields are represented by a VARCHAR containing the reference to the media file.
+"""
+
 class Media(models.Model):
 
     media_id = models.IntegerField()
@@ -131,7 +135,7 @@ class Media(models.Model):
     media = models.FileField(null=True)
 
     def __str__(self):
-        return "media-id {}, given name {}, media_name {}".format( self.media_id, self.name, self.media)
+        return "media-id {}, given name {}, media_name {}".format( self.media_id, self.name, self.media.name)
 
 class Landmark(models.Model):
     id =   models.AutoField(primary_key=True)
@@ -140,15 +144,12 @@ class Landmark(models.Model):
     desc   = models.CharField(max_length=200)
     longitude = models.FloatField()
     latitude = models.FloatField()
+    #actually requires edition of the database connection to a spatial database backend
+    #location = gis_model.PointField(null=True, blank=True)
     media = models.ManyToManyField(Media)
 
     def __str__(self):     
         return "{} - {} loc: {}-{}".format(self.landmark_id, self.name,self.longitude, self.latitude)
-
-"""
-Media uploaded to FileField are not saved in the database but in the file system of your server. 
-In the database it's the fields are represented by a VARCHAR containing the reference to the media file.
-"""
 
 
 

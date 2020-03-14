@@ -8,6 +8,7 @@ class MediaSerializer(serializers.HyperlinkedModelSerializer):
         model = Media
         fields = "__all__" #["landmark", 'name', "media"]
 
+
 class LandmarkSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Landmark

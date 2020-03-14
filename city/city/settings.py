@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     #'webapp',
     'webapp.apps.WebappConfig',
     'rest_framework',
+    'django_filters',
+
 
 ]
 
@@ -59,7 +61,7 @@ ROOT_URLCONF = 'city.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,6 +76,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'city.wsgi.application'
+
 
 
 
@@ -114,10 +117,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+# for serving media files in developing mode
 
 # Own URL Specification
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/city/media/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # for creating simple read-write API
@@ -130,16 +135,17 @@ REST_FRAMEWORK = {
         'rest_framework.authentification.BasicAuthentification',
         'rest_framework.authentification.SessionAuthentification',
     ),
-    'DEFAULT_PERMISSION_CLASSES': [
+    'DEFAULT_PERMISSION_CLASSES': (
         #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
         #'rest_framework.permissions.DjangoModelPermissions',
         'rest_framework.permissions.AllowAny',
-    ]
+    ),
+    'DEFAUL_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend',]
 }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.mysql', #  django.contrib.gis.db.backends.mysql
         'NAME': 'citymysql',
         'HOST': 'localhost', # docker host-ip! was db service name in yml file nor db nor localhost
         'PORT': '3306',
@@ -147,4 +153,5 @@ DATABASES = {
         'PASSWORD': 'stadtrundgang',
     }
 }
+
 

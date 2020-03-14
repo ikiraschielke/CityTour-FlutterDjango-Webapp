@@ -16,14 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 #for debugging stuff
+
 from django.conf import settings
+from django.urls import re_path
+from django.views.static import serve
 from django.conf.urls.static import static
 from django.conf.urls import url, include
 from django.contrib.auth.models import User
 import rest_framework
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import routers, serializers, viewsets
-from webapp import views
+from webapp import views, urls
+
 
 #In diesem URL DING ARBEITEN DAS SCHEINT IN DER HIERARCHIE AN DER RICHTIGEN STELLE ZU SEIN
 
@@ -39,23 +43,31 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 # Routers provide an easy way of automatically determining the URL conf.
+# starting from the index '' (api root index)
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register('media', views.MediaView)
-router.register('landmark', views.LandmarkView)
+router.register(r'media', views.MediaView)
+router.register(r'landmark', views.LandmarkView)
+#router.register(r'filterview',views.FilterView, basename='filter-view')
+
+
+
+
 
 
 # Setting up API for automatic URL routing
 # latter pattern is for enabeling browsable APIs
 # just in case we need it
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    #path('upload/', include('webapp.urls')),
-    #url(r'^landmarks/', views.LandmarkList.as_view()),
-    #url(r'^media/', views.MediaUploadView.as_view()), # where do i want to put it? 
+urlpatterns = [        
+    url(r'^index/', views.index),
+    url(r'^search/', views.search),
+    url(r'^radius/', views.radius),
+    url(r'admin/', admin.site.urls),
+    #path('', include(router.urls)),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls')),
 ]
+
 
 # for serving media files in developing mode
 if settings.DEBUG:

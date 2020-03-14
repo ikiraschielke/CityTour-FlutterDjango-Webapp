@@ -7,4 +7,6 @@ gunicorn==19.6.0
 #psycopg2==2.6.2
 whitenoise==3.2
 djangorestframework==3.11.0
-djangorestframework-simplejwt==4.4.0
+#djangorestframework-simplejwt==4.4.0
+#ne doch lieber nicht
+#django-geo==0.8

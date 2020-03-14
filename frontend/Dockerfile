@@ -1,13 +1,13 @@
 #DOCKER FILE FOR FRONTEND
 
-FROM node:13
+#FROM node:13
 RUN mkdir /frontend/
 WORKDIR /city/frontend
 
 #install dependencies
-COPY package*.json /city/frontend/
+#COPY package*.json /city/frontend/
 
-RUN npm install
+#RUN npm install
 #RUN npm install express
 
 #add rst of client code
@@ -16,10 +16,10 @@ COPY . /frontend/
 
 #TODO PORT MAPPING!
 #NOT LISTENING TO RIGHT PORT
-EXPOSE 3000
+#EXPOSE 3000
 
 
-CMD ["npm","start"]
+#CMD ["npm","start"]
 
 
 
