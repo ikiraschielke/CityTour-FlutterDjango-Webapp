@@ -1,4 +1,6 @@
 from django.shortcuts import render, HttpResponse
+from django.http import JsonResponse
+
 from django.core.exceptions import *
 #for file upload
 from rest_framework.parsers import FileUploadParser
@@ -62,29 +64,45 @@ def search(request):
         return render(request, 'form.html')
 
 #function that actually calculates the radius for landmarks
-def nearby_spots(request,longitude,latitude, radius, limit=50):
+def nearby_spots(request,longitude,latitude, radius):
     """
     WITHOUT use of any external library, using raw MySQL and Haversine Formula
     http://en.wikipedia.org/wiki/Haversine_formula
     """
-    radius = float(radius) / 1000.0
+    radius = float(radius) 
 
-    query = """SELECT id, (6367*acos(cos(radians(%2f))
-            *cos(radians(latitude))*cos(radians(longitude)-radians(%2f))
-            +sin(radians(%2f))*sin(radians(latitude))))
+    query = """SELECT id, (6367*
+                            acos(
+                                cos(radians(%8f))*
+                                cos(radians(latitude))*
+                                cos(radians(longitude)-
+                                radians(%8f))+
+                                sin(radians(%8f))*
+                                sin(radians(latitude))
+                                )
+                            )
             AS distance FROM webapp_landmark HAVING
-            distance < %2f ORDER BY distance LIMIT 0, %d""" % (
+            distance < %2f ORDER BY distance ASC""" % (
         float(latitude),
         float(longitude),
         float(latitude),
-        radius,
-        limit
+        radius
     )
 
     queryset = Landmark.objects.raw(query)
-    serializer = LandmarkSerializer(queryset, many=True, context={'request': request})
+    #print(type(queryset)) <class 'django.db.models.query.RawQuerySet'>
+    #print(queryset) #query mit werten ausgefüllt
+    #for p in queryset:
+    #    print(type(p)) #<class 'webapp.models.Landmark'>
+    #    print(p)
 
-    return queryset,Response(serializer.data)
+
+    serializer = LandmarkSerializer(queryset, many=True, context={'request': request})
+    print(serializer.data)
+
+
+    #just return the list to the radius function but render in radius
+    return  queryset #JsonResponse(serializer.data, safe=False)
 
 
 def radius(request):
@@ -93,11 +111,14 @@ def radius(request):
         latitude = request.POST.get('latfield', None)
         radius = request.POST.get('radiusfield', None)
         try:
-            #landmark = Landmark.objects.get(longitude=longitude,latitude=latitude) #, radius=radius
-            #now call function for filtering and pass those parameters on
-            filter_result, response = nearby_spots(request,longitude,latitude, radius)
-            html = ("<H1>%s</H1>", filter_result)
+
+            filter_result = nearby_spots(request,longitude,latitude, radius)
+            serializer = LandmarkSerializer(filter_result, many=True, context={'request': request})
+            html = (serializer.data)
+
+            #html = ("<H1>%s</H1>", filter_result[0],filter_result[1],filter_result[2])
             return HttpResponse(html)
+            #JsonResponse(serializer.data, safe=False)
         except Landmark.DoesNotExist:
             return HttpResponse("no matching results found")  
     else:
