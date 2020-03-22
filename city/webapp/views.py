@@ -7,6 +7,7 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 # for filtering
+# probably redundant as it is also in settings.py in DJANGO-REST
 from django_filters.rest_framework import DjangoFilterBackend
 #from django_filters import rest_framework as filters
 #misc imports
@@ -113,8 +114,10 @@ def radius(request):
         try:
 
             filter_result = nearby_spots(request,longitude,latitude, radius)
+            #print(filter_result)
             serializer = LandmarkSerializer(filter_result, many=True, context={'request': request})
             html = (serializer.data)
+            #print(html)
 
             #html = ("<H1>%s</H1>", filter_result[0],filter_result[1],filter_result[2])
             return HttpResponse(html)

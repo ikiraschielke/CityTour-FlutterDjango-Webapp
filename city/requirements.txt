@@ -1,0 +1,8 @@
+Django==2.2.9
+mysqlclient==1.4.6
+django-mysql==2.2.0
+path
+dj-database-url==0.4.1
+djangorestframework==3.11.0
+django-filter
+

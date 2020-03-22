@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -37,11 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'city',
+    'django_filters',
+    'city',
     #'webapp',
     'webapp.apps.WebappConfig',
     'rest_framework',
-    'django_filters',
+
 
 
 ]
@@ -140,15 +142,15 @@ REST_FRAMEWORK = {
         #'rest_framework.permissions.DjangoModelPermissions',
         'rest_framework.permissions.AllowAny',
     ),
-    'DEFAUL_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend',]
+    'DEFAUL_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend'),
 }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', #  django.contrib.gis.db.backends.mysql
         'NAME': 'citymysql',
-        'HOST': 'localhost', # docker host-ip! was db service name in yml file nor db nor localhost
-        'PORT': '3306',
+        'HOST': 'db', # docker host-ip! was db service name in yml file nor db nor localhost
+        'PORT': '3306', #tcp port
         'USER': 'root',
         'PASSWORD': 'stadtrundgang',
     }

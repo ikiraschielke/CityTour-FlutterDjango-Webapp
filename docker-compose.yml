@@ -1,40 +1,35 @@
 version: '3'
 services: 
   backend: 
-    build: ./backend
-    command: "python manage.py runserver 0.0.0.0:8000"
+    build: ./city
+    command: bash -c "python city/manage.py migrate && python city/manage.py runserver 0.0.0.0:8000"
     depends_on: 
       - db
     links: 
-      - "db:db"
+      - db
     ports: 
       - "8000:8000"
     restart: always
     volumes: 
-      - ".:/city/backend"
+      - ".:/city"
   db:
     image: mysql:5.7
     environment:
-      MYSQL_HOST: localhost
-      MYSQL_PORT: 3306
-      MYSQL_DATABASE: citymysql
-      MYSQL_PASSWORD: stadtrundgang
-      MYSQL_ROOT_PASSWORD: stadtrundgang
+      MYSQL_DATABASE: 'citymysql'
+      MYSQL_PASSWORD: 'stadtrundgang'
+      MYSQL_ROOT_PASSWORD: 'stadtrundgang'
     ports: 
       - "3306:3306"
     restart: always
   frontend: 
     build: ./frontend
-    command: "npm start"
     depends_on: 
       - backend
-    environment: 
-      - NODE_ENV=development
     links: 
       - "db:db"
     ports: 
       - "3000:3000"
     restart: always
     volumes: 
-      - "./frontend:/city/frontend"
+      - "./frontend:/home/developer"
 version: "3"
