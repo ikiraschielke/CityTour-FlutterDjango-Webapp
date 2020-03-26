@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'city',
+    #'city',
+    #'webapp',
+    'webapp.apps.WebappConfig',
     'rest_framework',
 
 ]
@@ -113,6 +115,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Own URL Specification
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 # for creating simple read-write API
 # user access on information
 
@@ -124,7 +131,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentification.SessionAuthentification',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        #'rest_framework.permissions.DjangoModelPermissions',
+        'rest_framework.permissions.AllowAny',
     ]
 }
 
