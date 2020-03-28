@@ -65,7 +65,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
-        'OPTIONS': {
+        'OPTIONS': { 
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -145,14 +145,20 @@ REST_FRAMEWORK = {
     'DEFAUL_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend'),
 }
 
+#https://blog.ionelmc.ro/2014/12/28/terrible-choices-mysql/
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', #  django.contrib.gis.db.backends.mysql
+        'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'citymysql',
-        'HOST': 'db', # docker host-ip! was db service name in yml file nor db nor localhost
+        'HOST': 'db', # db for deplyment or localhost for developing
         'PORT': '3306', #tcp port
         'USER': 'root',
         'PASSWORD': 'stadtrundgang',
+        'OPTIONS': {
+            'sql_mode': 'TRADITIONAL',
+            'charset': 'utf8',
+            'init_command': 'SET default_storage_engine=INNODB, character_set_connection=utf8, collation_connection=utf8_bin',
+        }
     }
 }
 

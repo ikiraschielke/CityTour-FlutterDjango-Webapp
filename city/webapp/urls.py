@@ -1,9 +1,7 @@
-from django.urls import path
-from .views import MediaUploadView
-"""
-app_name = 'MediaUploadView'
+from django.urls import path, include
+from .views import *
+
 
 urlpatterns = [
-    path('MediaUploadView/', MediaUploadView.as_view()),
+    path('', include('city.urls')),
 ]
-"""

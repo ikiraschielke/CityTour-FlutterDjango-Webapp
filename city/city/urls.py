@@ -48,6 +48,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'media', views.MediaView)
 router.register(r'landmark', views.LandmarkView)
+router.register(r'textblock',views.TextBlockView)
 #router.register(r'filterview',views.FilterView, basename='filter-view')
 
 
@@ -58,12 +59,15 @@ router.register(r'landmark', views.LandmarkView)
 # Setting up API for automatic URL routing
 # latter pattern is for enabeling browsable APIs
 # just in case we need it
-urlpatterns = [        
+urlpatterns = [ 
+    path('textblocks/', views.textblock_list),
+    path('textblocks/<int:pk>/',views.textblock_detail),
+    path('landmarks/', views.landmark_list),
+    path('landmarks/<int:pk>/',views.landmark_detail),
     url(r'^index/', views.index),
     url(r'^search/', views.search),
     url(r'^radius/', views.radius),
     url(r'admin/', admin.site.urls),
-    #path('', include(router.urls)),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls')),
 ]

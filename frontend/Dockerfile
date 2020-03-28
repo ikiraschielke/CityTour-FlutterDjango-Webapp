@@ -8,6 +8,7 @@ RUN useradd -ms /bin/bash developer
 USER developer
 WORKDIR /home/developer
 
+
 # Prepare Android directories and system variables
 RUN mkdir -p Android/Sdk
 ENV ANDROID_SDK_ROOT /home/developer/Android/Sdk
@@ -19,6 +20,8 @@ RUN unzip sdk-tools.zip && rm sdk-tools.zip
 RUN mv tools Android/Sdk/tools
 RUN cd Android/Sdk/tools/bin && yes | ./sdkmanager --licenses
 RUN cd Android/Sdk/tools/bin && ./sdkmanager "build-tools;29.0.2" "patcher;v4" "platform-tools" "platforms;android-29" "sources;android-29"
+
+#TODO ADD ADROID SDK TO ENV'S PATH
 
 # Download Flutter SDK
 RUN git clone https://github.com/flutter/flutter.git

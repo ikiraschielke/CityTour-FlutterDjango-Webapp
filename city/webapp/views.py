@@ -1,22 +1,22 @@
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
-
+from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import *
 #for file upload
-from rest_framework.parsers import FileUploadParser
+from rest_framework.parsers import FileUploadParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 # for filtering
 # probably redundant as it is also in settings.py in DJANGO-REST
 from django_filters.rest_framework import DjangoFilterBackend
-#from django_filters import rest_framework as filters
+
 #misc imports
 from rest_framework import viewsets,status, generics, filters
 
 
-from . models import Landmark, Media
-from . serializers import LandmarkSerializer, MediaSerializer
-#from . filters import LandmarkFilter
+from . models import Landmark, Media, TextBlock
+from . serializers import LandmarkSerializer, MediaSerializer, TextBlockSerializer
+
 
 
 
@@ -32,8 +32,7 @@ class LandmarkView(viewsets.ModelViewSet):
     #nach zahlen kann nur exzakt gefilter werden
     #mit searchfield und $ regex suche
     filter_backends = [DjangoFilterBackend]
-    filter_fields = ['landmark_id']
-
+    filter_fields = ['id']
 
 
 # ViewSets define the view behavior.
@@ -42,7 +41,15 @@ class MediaView(viewsets.ModelViewSet):
     serializer_class = MediaSerializer
 
     filter_backends = [filters.SearchFilter]
-    search_fields = ['$name','$media', '$media_id']
+    search_fields = ['$name','$media', '$id']
+
+class TextBlockView(viewsets.ModelViewSet):
+    queryset = TextBlock.objects.all()
+    serializer_class = TextBlockSerializer
+
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['$header','$body']
+
 
 ########################################################
 #get user input
@@ -106,6 +113,7 @@ def nearby_spots(request,longitude,latitude, radius):
     return  queryset #JsonResponse(serializer.data, safe=False)
 
 
+# function wo which Django view url routes is linked to!
 def radius(request):
     if request.method == 'POST':
         longitude = request.POST.get('longfield', None)
@@ -127,10 +135,99 @@ def radius(request):
     else:
         return render(request, 'radius_form.html')
 
-
-
-
+#TEXTBLOCK
 #########################################################
+@csrf_exempt
+def textblock_list(request):
+    """
+    List all textblock entries, or create a new text block entry.
+    """
+    if request.method == 'GET':
+        textblocks = TextBlock.objects.all()
+        serializer = TextBlockSerializer(textblocks, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = TextBlockSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+@csrf_exempt
+def textblock_detail(request, pk):
+    """
+    Retrieve, update or delete a textblock entry.
+    """
+    try:
+        textblock = TextBlock.objects.get(pk=pk)
+    except TextBlock.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = TextBlockSerializer(textblock)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = TextBlockSerializer(textblock, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        textblock.delete()
+        return HttpResponse(status=204)
+#########################################################
+
+#Landmark
+@csrf_exempt
+def landmark_list(request):
+    """
+    List all textblock entries, or create a new landmark entry.
+    """
+    if request.method == 'GET':
+        landmarks = Landmark.objects.all()
+        serializer = LandmarkSerializer(landmarks, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = LandmarkSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
+@csrf_exempt
+def landmark_detail(request, pk):
+    """
+    Retrieve, update or delete a landmark entry.
+    """
+    try:
+        landmark = Landmark.objects.get(pk=pk)
+    except Landmark.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = TextBlockSerializer(landmark)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = LandmarkSerializer(landmark, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        landmark.delete()
+        return HttpResponse(status=204)
+
+###########################################################
 
 #simple view is enough 
 class MediaUploadView(APIView):

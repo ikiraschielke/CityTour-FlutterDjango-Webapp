@@ -124,32 +124,45 @@ class DjangoSession(models.Model):
 ###########################################
 
 """
+Text is supposed to be own model, so it can be shown on the slide view in the frontend
+"""
+
+class TextBlock(models.Model):
+    id      = models.AutoField(primary_key=True)
+    header  = models.CharField(max_length=200, null=True)
+    body    = models.CharField(max_length=4000) # char amount of one Word document with whitespaces
+    #Assign author later over login system
+    author = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "text-id {},header {}, body {}".format( self.id, self.header, self.body)
+
+"""
 Media uploaded to FileField are not saved in the database but in the file system of your server. 
 In the database it's the fields are represented by a VARCHAR containing the reference to the media file.
 """
 
 class Media(models.Model):
 
-    media_id = models.IntegerField()
+    id = models.AutoField(primary_key=True)
     name    = models.CharField(max_length=200)
     media = models.FileField(null=True)
 
     def __str__(self):
-        return "media-id {}, given name {}, media_name {}".format( self.media_id, self.name, self.media.name)
+        return "media-id {}, given name {}, media_name {}".format( self.id, self.name, self.media.name)
 
 class Landmark(models.Model):
     id =   models.AutoField(primary_key=True)
-    landmark_id = models.IntegerField()
     name    = models.CharField(max_length=200)
     desc   = models.CharField(max_length=200)
     longitude = models.FloatField()
     latitude = models.FloatField()
-    #actually requires edition of the database connection to a spatial database backend
-    #location = gis_model.PointField(null=True, blank=True)
-    media = models.ManyToManyField(Media)
+
+    media = models.ManyToManyField(Media, blank=True)
+    text = models.ManyToManyField(TextBlock, blank=True)
 
     def __str__(self):     
-        return "{} - {} loc: {}-{}".format(self.landmark_id, self.name,self.longitude, self.latitude)
+        return "landmark_id: {} - {} loc: {}-{}, media: {}".format(self.id, self.name,self.longitude, self.latitude,self.media)
 
 
 

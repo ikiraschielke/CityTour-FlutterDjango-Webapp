@@ -2,7 +2,7 @@ version: '3'
 services: 
   backend: 
     build: ./city
-    command: bash -c "python city/manage.py migrate && python city/manage.py runserver 0.0.0.0:8000"
+    command: bash -c "python city/manage.py migrate && python city/manage.py runserver 127.0.0.1:8000"
     depends_on: 
       - db
     links: 
@@ -23,13 +23,12 @@ services:
     restart: always
   frontend: 
     build: ./frontend
+    #command: bash -c " cd frontend/FrontendPrototype && flutter doctor"
     depends_on: 
       - backend
     links: 
       - "db:db"
     ports: 
-      - "3000:3000"
+      - "8443:8443"
     restart: always
-    volumes: 
-      - "./frontend:/home/developer"
 version: "3"

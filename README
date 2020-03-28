@@ -1,3 +1,3 @@
-neede to be installed
-fuck djangogis
-pip install django-geo
+MySQL 5.7
+Django 2.2.9
+DjangoRestFramework 3.11.0
