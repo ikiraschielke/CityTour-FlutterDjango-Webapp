@@ -23,7 +23,7 @@ services:
     restart: always
   frontend: 
     build: ./frontend
-    #command: bash -c " cd frontend/FrontendPrototype && flutter doctor"
+    command:  flutter doctor #bash -c "flutter devices && flutter run -d web-server" #flutter packages pub global run webdev serve #bash -c "flutter devices && flutter run -d web-server"
     depends_on: 
       - backend
     links: 

@@ -26,6 +26,7 @@ SECRET_KEY = 'vtix8tx!olo^3pz%xh^fny3&qjnlkxiiv9@gzivscl9^i1+5t9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+#allow django to run on db, local and on docker hosts starting with 192.168.99.100 !
 ALLOWED_HOSTS = ['db','localhost','127.0.0.1', '192.168.99.100:8000', '192.168.99.100']
 
 
@@ -40,9 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'city',
-    #'webapp',
     'webapp.apps.WebappConfig',
     'rest_framework',
+    'corsheaders',
 
 
 
@@ -51,12 +52,18 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
+#Adding Cross-Origin Resource Sharing (CORS) headers allows your resources to be accessed on other domains
+#all allowed
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'city.urls'
 
@@ -150,7 +157,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'citymysql',
-        'HOST': 'db', # db for deplyment or localhost for developing
+        'HOST': 'localhost', # db for deplyment or localhost for developing
         'PORT': '3306', #tcp port
         'USER': 'root',
         'PASSWORD': 'stadtrundgang',

@@ -1,3 +1,44 @@
 MySQL 5.7
 Django 2.2.9
 DjangoRestFramework 3.11.0
+
+cd city ( all following commands must be called within root folder city (not city/city)) 
+view Django webapp to check on fucntionality and urls:
+python manage.py runserver
+
+it also provides it own shell
+python manage.py shell
+(.py files can be imported and tested etc)
+
+to delete ALL values in DB this also deletes the Admin and all Users! and their passwords:
+python manage.py flush
+
+to create a new superuser:
+python manage.py createsuperuser
+then follow the instructions on the command line
+
+for creating new migrations (uptade and tell django that and what has been changed)
+python manage.py makemigrations
+
+to apply any changes made on the DB
+python manage.py migrate 
+
+
+DOCKER
+docker default ip is 192.168.99.100
+starting docker machine
+docker-machine start default
+
+Three services will be started called backend, db and frontend (see docker-compose.yml)
+navigate into project root (where docker-compose.yml) should be and 
+
+docker-compose build
+
+this will build all three container, links are defined in the docker YAML file
+
+docker-compose up
+
+TODO GIT
+
+
+

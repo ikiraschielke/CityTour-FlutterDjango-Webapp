@@ -1,5 +1,5 @@
 from django.db import models
-#from django.contrib.gis.db import models as gis_model
+from rest_framework.fields import ListField
 
 # Create your models here.
 # This is an auto-generated Django model module.
@@ -123,16 +123,22 @@ class DjangoSession(models.Model):
 
 ###########################################
 
+
 """
 Text is supposed to be own model, so it can be shown on the slide view in the frontend
 """
 
 class TextBlock(models.Model):
     id      = models.AutoField(primary_key=True)
-    header  = models.CharField(max_length=200, null=True)
-    body    = models.CharField(max_length=4000) # char amount of one Word document with whitespaces
+    header  = models.CharField(max_length=200)
+    body    = models.TextField() # alternative CharField with approx 4000 chars amount of one Word document with whitespaces
     #Assign author later over login system
     author = models.CharField(max_length=200)
+
+    #convention of returning name and not id 
+    #header may not be null
+    def natural_key(self):
+        return(self.header)
 
     def __str__(self):
         return "text-id {},header {}, body {}".format( self.id, self.header, self.body)
@@ -148,6 +154,10 @@ class Media(models.Model):
     name    = models.CharField(max_length=200)
     media = models.FileField(null=True)
 
+    #convention of returning name and not id 
+    def natural_key(self):
+        return(self.name)
+
     def __str__(self):
         return "media-id {}, given name {}, media_name {}".format( self.id, self.name, self.media.name)
 
@@ -161,36 +171,9 @@ class Landmark(models.Model):
     media = models.ManyToManyField(Media, blank=True)
     text = models.ManyToManyField(TextBlock, blank=True)
 
+    #convention of returning name and not id 
+    def natural_key(self):
+        return(self.name)
+
     def __str__(self):     
-        return "landmark_id: {} - {} loc: {}-{}, media: {}".format(self.id, self.name,self.longitude, self.latitude,self.media)
-
-
-
-
-# Create your models here.
-"""
-
-# one user can have multiple tours
-# one medium can belong to multiple tours
-
-#tour has many landmarks
-class Tour(models.Model):
-	tour_id =  models.IntegerField(primary_key=True)
-	name = models.CharField(unique=True, max_length=40)
-	user_id = models.ForeignKey(User, db_column='user_id', on_delete=models.CASCADE, related_name = 'users')
-	media_id = models.ForeignKey(Media,db_column='media_id',on_delete=models.CASCADE, related_name='tours')
-	description = models.CharField(max_length=200)
-
-	def __str__(self):
-		return self.name
-
-	class Meta:
-		managed = False
-		#db_table = 'tours'
-		#unique_together = (('user_id','media_id'))
-		#but instead
-		#which unique sets do we have within one tour?!
-		#constraints = [
-        #    models.UniqueConstraint(fields=['user_id', 'media_id'], name='unique_tour')
-        #]
-	"""
+        return "landmark-id {}, given name {}, long: {}, lat: {}".format(self.id, self.name,self.longitude, self.latitude,self.media)

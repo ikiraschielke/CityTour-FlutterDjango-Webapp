@@ -1,3 +1,4 @@
+"""
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
 #   * Rearrange models' order
@@ -117,65 +118,4 @@ class DjangoSession(models.Model):
         managed = False
         db_table = 'django_session'
 
-###########################################
-
-# Create your models here.
 """
-class User(models.Model):
-	user_id		= models.IntegerField(primary_key=True)
-	firstname	= models.CharField(max_length=200)
-	lastname    = models.CharField(max_length=200)
-	email		= models.CharField(unique=True, max_length=200)
-	
-	def __str__(self):     
-		return self.email
-
-	#class Meta:     
-	#	managed = False       
-	#	db_table = 'users'
-
-
-
-	
-class Admin(models.Model):
-	admin_id	= models.IntegerField(primary_key=True)
-	firstname	= models.CharField(max_length=200)
-	lastname    = models.CharField(max_length=200)
-	email		= models.CharField(unique=True, max_length=200)
-	
-	def __str__(self):
-		return self.email
-
-	#class Meta:
-	#	managed = False    
-	#	db_table = 'admins' 
-
-
-
-class Media(models.Model):
-	media_id = models.IntegerField(primary_key=True)
-	user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='medias')
-
-
-# one user can have multiple tours
-# one medium can belong to multiple tours
-class Tour(models.Model):
-	tour_id =  models.IntegerField(primary_key=True)
-	name = models.CharField(unique=True, max_length=40)
-	user_id = models.ForeignKey(User, db_column='user_id', on_delete=models.CASCADE, related_name = 'users')
-	media_id = models.ForeignKey(Media,db_column='media_id',on_delete=models.CASCADE, related_name='tours')
-	description = models.CharField(max_length=200)
-
-	def __str__(self):
-		return self.name
-
-	class Meta:
-		managed = False
-		#db_table = 'tours'
-		#unique_together = (('user_id','media_id'))
-		#but instead
-		#which unique sets do we have within one tour?!
-		#constraints = [
-        #    models.UniqueConstraint(fields=['user_id', 'media_id'], name='unique_tour')
-        #]
-	"""

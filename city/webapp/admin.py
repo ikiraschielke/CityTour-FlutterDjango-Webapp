@@ -1,18 +1,11 @@
 from django.contrib import admin
-from .models import Landmark, Media
+from .models import Landmark, Media, TextBlock
 
-# Register your models here.
+# Register your models here for the Django Admin Page
+# http://127.0.0.1:8000/admin/login/?next=/admin/
+# user: Superuser
+# pw: superpassword
 
 admin.site.register(Landmark)
 admin.site.register(Media)
-
-"""
-#The admin interface has the ability to edit models on the same page as a parent model.
-class MediaInline(admin.TabularInline):
-    model = Media
-
-class LandmarkAdmin(admin.ModelAdmin):
-    inlines = [
-        MediaInline,
-    ]
-"""
+admin.site.register(TextBlock)

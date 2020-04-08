@@ -5,26 +5,125 @@ from django.core.exceptions import *
 #for file upload
 from rest_framework.parsers import FileUploadParser, JSONParser
 from rest_framework.response import Response
-from rest_framework.views import APIView
+
 # for filtering
-# probably redundant as it is also in settings.py in DJANGO-REST
 from django_filters.rest_framework import DjangoFilterBackend
 
 #misc imports
-from rest_framework import viewsets,status, generics, filters
+from rest_framework import viewsets,status , filters
 
 
 from . models import Landmark, Media, TextBlock
 from . serializers import LandmarkSerializer, MediaSerializer, TextBlockSerializer
 
 
+from rest_framework.parsers import JSONParser, MultiPartParser
+from rest_framework.decorators import action, parser_classes
+from django.core import serializers
 
 
 
+# ViewSets define the view behavior.
+class MediaView(viewsets.ModelViewSet):
+    queryset = Media.objects.all()
+    serializer_class = MediaSerializer
+
+    #filter_backends = [filters.SearchFilter]
+    #search_fields = ['$name','$media', '$id']
+    parser_classes = (JSONParser,MultiPartParser)
 
 
-#viewsets stick with them and not with the apiview makes routing also easier
-# Create your views here.
+    @action(detail=False, methods=['put'], name='Uploader View',)
+    def uploader(self, request, format=None):
+        data = request.data
+        serializer = MediaSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return JSONResponse(serializer.data,status=201)
+        return JSONResponse(serializer.errors, status=400)
+        
+
+class LandmarkPut(viewsets.ModelViewSet):
+    queryset = Landmark.objects.all()
+    serializer_class = LandmarkSerializer
+
+    parser_classes = (JSONParser,MultiPartParser)
+
+    @action(detail=False, methods=['put'], name='Landmark Put',)
+    def put(self, request, format=None):
+        # APPROACH 1; BUILD JSON REQUEST MANUALLY, BY EXTRACTING EACH FIELD AND THEN BUILDING DICT BY HAND
+        # ACCORDING to Felix this approach actually led to the right direction, however
+        # list of indeces couldn't be passed on in the request or request was sucessful, BUT wrong response was given
+ 
+        data = request.data
+
+        name = request.data['name']
+        desc = request.data['desc']
+        longitude = request.data['longitude']
+        latitude = request.data['latitude']
+        #get ids from request
+        media_ids = request.data['media'] #<- only shows last item INSTEAD OF BEING A LIST
+        text_ids = request.data['text']
+
+
+        #läuft aber jetzt ist long-lat in field und das will der Felix nicht
+        landmark = Landmark.objects.create(name=name,desc=desc,longitude=float(longitude),latitude=float(latitude))
+        landmark.media.set(medias)
+        landmark.text.set(texts)
+        #hässlicher serializer
+        serializer = serializers.serialize('json',[landmark,])
+        '''
+        print(serializer)
+        try:
+            return Response(serializer,status=201)
+        except Exception as e:
+            return Response(e, status=400)
+        '''
+        # APPROACH 2; classic
+
+
+        put_ser = LandmarkSerializer(data=request.data)
+
+        if put_ser.is_valid():
+            put_ser.save()
+
+            #APPROACH 3; save landmark instance with the all the indeces in the wrong format
+            #then reparse the json and substitute the indeces with the actual indeces (nestes serializer)
+            #throws error in the backend
+            '''
+            #actually get an instance of the class with the id
+            medias = Media.objects.filter(id__in=media_ids)
+            texts = TextBlock.objects.filter(id__in=text_ids)
+        
+
+            media_serializer = MediaSerializer(medias , many=True)
+            text_serializer = TextBlockSerializer(texts , many=True)
+            for medium_id in put_ser.data['media']:
+                medium = Media.objects.get(pk=medium_id)
+                (print(medium.name))
+                for val in put_ser.data['media']:
+                    print(val)
+                    med_ser = MediaSerializer(medium)
+                    print("medser data:", med_ser.data)
+                    ind = put_ser.data['media'].index(val)
+                    put_ser.data['media'][ind] = med_ser
+                print("zusammengebasteltet json", put_ser.data)
+            #seriliazer data {'id': 62, 'name': 'xked', 'desc': 'media 4 und 5', 'longitude': 829.6, 'latitude': 48.0, 'media': [4, 5], 'text': [4]}  
+            '''
+            return JsonResponse(put_ser.data, status=201)
+        else:
+            return JsonResponse(put_ser.errors, status=400)
+
+
+class TextBlockView(viewsets.ModelViewSet):
+    queryset = TextBlock.objects.all()
+    serializer_class = TextBlockSerializer
+
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['$header','$body']
+
+#hat keinen path||url mehr
 class LandmarkView(viewsets.ModelViewSet):
     queryset = Landmark.objects.all()
     serializer_class = LandmarkSerializer
@@ -34,42 +133,11 @@ class LandmarkView(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filter_fields = ['id']
 
-
-# ViewSets define the view behavior.
-class MediaView(viewsets.ModelViewSet):
-    queryset = Media.objects.all()
-    serializer_class = MediaSerializer
-
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['$name','$media', '$id']
-
-class TextBlockView(viewsets.ModelViewSet):
-    queryset = TextBlock.objects.all()
-    serializer_class = TextBlockSerializer
-
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['$header','$body']
-
-
 ########################################################
-#get user input
+#for radius search
 def index(request):
 
     return render(request, 'radius_form.html')
-
-def search(request):
-    if request.method == 'POST':
-        search_id = request.POST.get('textfield', None)
-        try:
-            landmark = Landmark.objects.get(name = search_id)
-            #landmark_serializer = LandmarkSerializer(landmark , many=True)
-            #do something with user
-            html = ("<H1>%s</H1>", landmark)
-            return HttpResponse(html)
-        except Landmark.DoesNotExist:
-            return HttpResponse("no such landmark")  
-    else:
-        return render(request, 'form.html')
 
 #function that actually calculates the radius for landmarks
 def nearby_spots(request,longitude,latitude, radius):
@@ -98,20 +166,11 @@ def nearby_spots(request,longitude,latitude, radius):
     )
 
     queryset = Landmark.objects.raw(query)
-    #print(type(queryset)) <class 'django.db.models.query.RawQuerySet'>
-    #print(queryset) #query mit werten ausgefüllt
-    #for p in queryset:
-    #    print(type(p)) #<class 'webapp.models.Landmark'>
-    #    print(p)
-
 
     serializer = LandmarkSerializer(queryset, many=True, context={'request': request})
-    print(serializer.data)
-
 
     #just return the list to the radius function but render in radius
-    return  queryset #JsonResponse(serializer.data, safe=False)
-
+    return  queryset 
 
 # function wo which Django view url routes is linked to!
 def radius(request):
@@ -122,10 +181,8 @@ def radius(request):
         try:
 
             filter_result = nearby_spots(request,longitude,latitude, radius)
-            #print(filter_result)
             serializer = LandmarkSerializer(filter_result, many=True, context={'request': request})
             html = (serializer.data)
-            #print(html)
 
             #html = ("<H1>%s</H1>", filter_result[0],filter_result[1],filter_result[2])
             return HttpResponse(html)
@@ -135,8 +192,9 @@ def radius(request):
     else:
         return render(request, 'radius_form.html')
 
-#TEXTBLOCK
+
 #########################################################
+#TEXTBLOCK
 @csrf_exempt
 def textblock_list(request):
     """
@@ -180,9 +238,9 @@ def textblock_detail(request, pk):
     elif request.method == 'DELETE':
         textblock.delete()
         return HttpResponse(status=204)
-#########################################################
 
-#Landmark
+#########################################################
+#LANDMARK
 @csrf_exempt
 def landmark_list(request):
     """
@@ -195,6 +253,9 @@ def landmark_list(request):
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
+        #data = request.data
+        media = Media.object.get(pk=1)
+        text = TextBlock.object.get(pk=1)
         serializer = LandmarkSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -212,12 +273,12 @@ def landmark_detail(request, pk):
         return HttpResponse(status=404)
 
     if request.method == 'GET':
-        serializer = TextBlockSerializer(landmark)
+        serializer = LandmarkSerializer('json',landmarks, many=True, fields=['media', 'text'])
         return JsonResponse(serializer.data)
 
     elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = LandmarkSerializer(landmark, data=data)
+        data = request.data
+        serializer = LandmarkSerializer('json',data=data, fields=['media', 'text'])
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data)
@@ -227,26 +288,70 @@ def landmark_detail(request, pk):
         landmark.delete()
         return HttpResponse(status=204)
 
-###########################################################
+def search(request):
+    if request.method == 'POST':
+        search_name = request.POST.get('textfield', None)
+        try:
+            #landmark = Landmark.objects.filter(name = search_name) #<- exacte suche
+            landmark = Landmark.objects.filter(name__contains = search_name) 
+            landmark_serializer = LandmarkSerializer(landmark , many=True, context={'request': request})
 
-#simple view is enough 
-class MediaUploadView(APIView):
+            return JsonResponse(landmark_serializer.data,safe=False)
+        except Landmark.DoesNotExist:
+            return JsonResponse(landmark_serializer.error,404)
+    else:
+        return render(request, 'form.html')
 
-    def get(self, request):
-        media = Media.objects.all()
 
-        media_serializer = MediaSerializer(media , many=True)
-        return Response(media_serializer.data) 
+##########################################################################
+#MEDIA
 
-    parser_class = (FileUploadParser,)
+@csrf_exempt
+def media_list(request):
+    """
+    List all textblock entries, or create a new media entry.
+    """
+    if request.method == 'GET':
+        medias = Media.objects.all()
+        serializer = MediaSerializer(medias, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
-    def post(self, request, *args, **kwargs):
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = MediaSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
 
-      media_serializer = MediaSerializer(data=request.data)
 
-      if media_serializer.is_valid():
-          media_serializer.save()
-          return Response(media_serializer.data, status=status.HTTP_201_CREATED)
-      else:
-          return Response(media_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@csrf_exempt
+def media_detail(request, pk):
+    """
+    Retrieve, update or delete a media entry.
+    """
+    try:
+        media = Media.objects.get(pk=pk)
+    except Media.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'GET':
+        serializer = MediaSerializer(media)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = MediaSerializer(media, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == 'DELETE':
+        media.delete()
+        return HttpResponse(status=204)
+
+
+
+
 

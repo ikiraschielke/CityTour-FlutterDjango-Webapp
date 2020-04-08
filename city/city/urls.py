@@ -43,27 +43,28 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
 # Routers provide an easy way of automatically determining the URL conf.
-# starting from the index '' (api root index)
+# starting from the index '' (api root index) http://127.0.0.1:8000/
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'media', views.MediaView)
 router.register(r'landmark', views.LandmarkView)
 router.register(r'textblock',views.TextBlockView)
-#router.register(r'filterview',views.FilterView, basename='filter-view')
+router.register(r'intermediate', views.LandmarkPut)
 
 
+# Each function has its own Url path.
+# pay attention to intermediate/put/ it should belong to a landmark URL PATH
+# was needed for distinct debugging purposes
 
-
-
-
-# Setting up API for automatic URL routing
-# latter pattern is for enabeling browsable APIs
-# just in case we need it
 urlpatterns = [ 
     path('textblocks/', views.textblock_list),
     path('textblocks/<int:pk>/',views.textblock_detail),
     path('landmarks/', views.landmark_list),
     path('landmarks/<int:pk>/',views.landmark_detail),
+    path('medias/',views.media_list),
+    path('medias/<int:pk>/',views.media_detail),
+    url(r'^media/uploader/ ', views.MediaView.as_view({'put': 'uploader'}), name='posts_uploader'),
+    url(r'^intermediate/put/ ', views.LandmarkPut.as_view({'put': 'put'}), name='landmark_put'),
     url(r'^index/', views.index),
     url(r'^search/', views.search),
     url(r'^radius/', views.radius),
@@ -74,6 +75,8 @@ urlpatterns = [
 
 
 # for serving media files in developing mode
+# FOR DEPLOYMENT, REMOVE HERE AND REMOVE IN SETTINGS.PY line 26 and 27 DEBUG = True should be False then
+
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
