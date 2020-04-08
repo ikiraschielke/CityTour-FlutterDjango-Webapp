@@ -38,7 +38,7 @@ this will build all three container, links are defined in the docker YAML file
 
 docker-compose up
 
-TODO GIT
+
 
 
 
